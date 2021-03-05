@@ -1,0 +1,16 @@
+content: "Hello {{ args.recipient_name }},
+
+
+Thanks for you email. Enjoy your {{ args.product }}
+
+
+
+Best,
+
+
+{{ config.name }}
+
+{{ config.role }}"
+args:
+    - recipient_name
+    - product

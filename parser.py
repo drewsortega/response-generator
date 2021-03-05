@@ -28,7 +28,14 @@ def parse_template(template_path):
 
         # iterate args, request them, then add to args for templating
         for listed_arg in template_data['args']:
-            args[listed_arg] = r.text_entry(listed_arg)
+            entry = r.generic_entry(listed_arg)
+
+            # if we cancelled the entry, return emptry string
+            if entry == None:
+                return ""
+
+            # if we got a valid entry, continue
+            args[listed_arg] = entry
 
     # combine args and global configurations into one object to pass
     template_fields = dict()
