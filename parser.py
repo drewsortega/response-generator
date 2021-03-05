@@ -14,10 +14,10 @@ from rofi import Rofi
 def parse_template(template_path):
     # get the template data from the template file
     template_data = yaml.load(open(template_path), Loader=Loader)
-    # get the global config info from the top-level config.yml file
-    config_data = yaml.load(open(os.path.join(os.path.dirname(__file__), 'config.yml')), Loader=Loader)
+    # get the global config info from the top-level global_vars.yml file
+    global_data = yaml.load(open(os.path.join(os.path.dirname(__file__), 'global_vars.yml')), Loader=Loader)
     
-    # create a template to parse the template_data and config_data into
+    # create a template to parse the template_data and global_data into
     template = jinja2.Template(template_data['content'])
 
     # if there is an "args" object in template data, iterate it.
@@ -39,7 +39,7 @@ def parse_template(template_path):
 
     # combine args and global configurations into one object to pass
     template_fields = dict()
-    template_fields['config'] = config_data
+    template_fields['global'] = global_data
     template_fields['args'] = args
 
     # parse and return finished template
