@@ -10,12 +10,45 @@ import os
 import jinja2
 from rofi import Rofi
 
+install_path = os.path.dirname(__file__)
+
+# generate a Pango-formatted message to print in rofi
+# to help users know what has been filled out, and what has not
+def generate_vars_list(template_args, provided_args):
+    filled_args = list()
+    unfilled_args = list()
+    message = ""
+
+    # iterate listed required args, and determine
+    # which have been not been provided.
+    for arg in template_args:
+        if arg not in provided_args:
+            unfilled_args.append(arg)
+
+    # if present, print the filled args and their values
+    if len(provided_args) > 0:
+        message = message + "<big>Filled Args:</big>\n"
+        for arg_name, arg_val in provided_args.items():
+            message = message + "  <b>{}:</b> {}".format(arg_name, arg_val)
+        if len(unfilled_args) > 0:
+            message = message + "\n\n"
+    
+    # if present, print the unfilled args and their values
+    if len(unfilled_args) > 0:
+        message = message + "<big>Unfilled Args:</big>\n"
+        for arg in unfilled_args:
+            message = message + "  <b>{}</b>\n".format(arg)
+
+    # return complete message
+    return message
+        
+
 # high-level template parser for importing if desired
 def parse_template(template_path):
     # get the template data from the template file
     template_data = yaml.load(open(template_path), Loader=Loader)
     # get the global config info from the top-level global_vars.yml file
-    global_data = yaml.load(open(os.path.join(os.path.dirname(__file__), 'global_vars.yml')), Loader=Loader)
+    global_data = yaml.load(open(os.path.join(install_path, 'global_vars.yml')), Loader=Loader)
     
     # create a template to parse the template_data and global_data into
     template = jinja2.Template(template_data['content'])
@@ -28,7 +61,7 @@ def parse_template(template_path):
 
         # iterate args, request them, then add to args for templating
         for listed_arg in template_data['args']:
-            entry = r.generic_entry(listed_arg)
+            entry = r.text_entry(listed_arg, message=generate_vars_list(template_data['args'], args))
 
             # if we cancelled the entry, return emptry string
             if entry == None:
